@@ -16,15 +16,9 @@
     "type": "git",
     "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
   },
-  "dependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
-  },
   "devDependencies": {
     "@types/chrome": "0.0.158",
     "@types/jest": "^27.0.2",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "glob": "^7.1.6",
     "jest": "^27.2.1",

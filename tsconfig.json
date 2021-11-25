@@ -8,7 +8,6 @@
         "rootDir": "src",
         "outDir": "dist/js",
         "noEmitOnError": true,
-        "jsx": "react",
         "typeRoots": [ "node_modules/@types" ]
     }
 }
