@@ -1,13 +1,22 @@
 /*
 NOTES
-I need to first write a function which checks if the email
-exists in the DOM.
+
+Working on isEmailinDOM
+
+Next steps:
+- create mock DOM for test environment with jsdom
+- get isEmailinDOM to return true
 
 */
+
+export function isEmailInDOM() {
+  return false;
+}
 
 export function init() {
   console.log("initializing chrome extension...");
   alert("Hello from your Chrome extension!");
 }
 
-init();
+// Commenting out because Jest will call this when requiring
+// init();
