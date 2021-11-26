@@ -3,7 +3,8 @@ import { Octokit } from "@octokit/rest";
 NOTES
 
 Next steps:
-- getEmailFromGitHubEventData
+- insertEmailIntoDOM
+- add Copy to clipboard into DOM
 
 */
 
