@@ -1,16 +1,18 @@
 /*
 NOTES
 
-Working on isEmailinDOM
-
 Next steps:
-- create mock DOM for test environment with jsdom
-- get isEmailinDOM to return true
 
 */
 
-export function isEmailInDOM() {
-  return false;
+/**
+ * Checks for the email in the DOM using querySelector.
+ * @returns {boolean} true if in DOM, false if not.
+ */
+export function isEmailInDOM(_document: Document) {
+  const EMAIL_CLASS = ".u-email";
+  const emailElement = _document.querySelector(EMAIL_CLASS);
+  return emailElement !== null;
 }
 
 export function init() {

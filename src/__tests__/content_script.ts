@@ -1,16 +1,32 @@
-/**
- * @jest-environment jsdom
- */
+import jsdom from "jsdom";
 import { isEmailInDOM } from "../content_script";
 
-window.alert = jest.fn();
+const { JSDOM } = jsdom;
 
 describe("isEmailInDOM", () => {
-  it("should return false if it doesn't", () => {
-    expect(isEmailInDOM()).toBe(false);
+  describe("without email in DOM", () => {
+    let mockDocument: Document;
+
+    beforeEach(() => {
+      // initialize DOM with empty body
+      mockDocument = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`).window
+        .document;
+    });
+    it("should return false if it doesn't", () => {
+      expect(isEmailInDOM(mockDocument)).toBe(false);
+    });
   });
-  it("should return true if it does", () => {
-    // TODO@jsjoeio pass in document and mock
-    expect(isEmailInDOM()).toBe(true);
+  describe("with the email in DOM", () => {
+    let mockDocument: Document;
+
+    beforeEach(() => {
+      // initialize DOM with empty body
+      mockDocument = new JSDOM(
+        `<!DOCTYPE html><a class="u-email Link--primary " href="mailto:joe@gmail.com">joe@gmail.com</a>`
+      ).window.document;
+    });
+    it("should return true if it does", () => {
+      expect(isEmailInDOM(mockDocument)).toBe(true);
+    });
   });
 });
