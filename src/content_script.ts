@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 NOTES
 
 Next steps:
-- refactor buildEmailElement
+- test out
 - add Copy to clipboard into DOM
 
 */
@@ -82,10 +82,27 @@ export const buildEmailElement = (
   <a class="u-email Link--primary " href="mailto:${email}">${email}</a>
 </li>`;
 
-export function init() {
+export async function init() {
   console.log("initializing chrome extension...");
-  alert("Hello from your Chrome extension!");
+  // Check for email
+  const hasEmailInProfile = isEmailInDOM(document);
+
+  // If they don't have their email in their profile
+  // then we need to fetch it from GitHub and show it
+  if (!hasEmailInProfile) {
+    const username = getGitHubUsernameFromURL(location);
+    const userEventData = await fetchGitHubUserEventData(username);
+    const email = getEmailFromGitHubEventData(userEventData);
+    if (email) {
+      insertEmailIntoDOM(document, email);
+    } else {
+      console.warn(
+        "[GitHub Email Extension]: Could not find email in user's latest public event data."
+      );
+    }
+  }
 }
 
-// Commenting out because Jest will call this when requiring
-// init();
+(async function () {
+  await init();
+})();
