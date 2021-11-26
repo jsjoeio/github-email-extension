@@ -4,6 +4,7 @@ import {
   getGitHubUsernameFromURL,
   fetchGitHubUserEventData,
   getEmailFromGitHubEventData,
+  insertEmailIntoDOM,
 } from "../content_script";
 
 const { JSDOM } = jsdom;
@@ -73,7 +74,7 @@ describe("getEmailFromGitHubEventData", () => {
   });
   it("should return the email if it exists", () => {
     // const fakeData: Awaited<ReturnType<typeof fetchGitHubUserEventData>> = [
-    const fakeData: any[]= [
+    const fakeData: any[] = [
       {
         id: "19068279411",
         type: "PushEvent",
@@ -127,5 +128,34 @@ describe("getEmailFromGitHubEventData", () => {
     const email = getEmailFromGitHubEventData(fakeData);
     const expected = "joe@gmail.com";
     expect(email).toBe(expected);
+  });
+});
+
+describe("insertEmailIntoDOM", () => {
+  let mockDocument: Document;
+
+  beforeEach(() => {
+    // initialize DOM with empty body
+    mockDocument = new JSDOM(`
+<!DOCTYPE html>
+<body>
+  <ul class="vcard-details">
+    <li title="Member since" class="vcard-detail pt-1 css-truncate css-truncate-target "><svg class="octicon octicon-clock" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.75a.75.75 0 00-1.5 0v3.5a.75.75 0 00.471.696l2.5 1a.75.75 0 00.557-1.392L8.5 7.742V4.75z"></path></svg>
+      <span class="join-label">Joined </span>
+      <relative-time datetime="2021-11-03T09:04:50Z" class="no-wrap" title="Nov 3, 2021, 2:04 AM MST">24 days ago</relative-time>
+    </li>
+  </ul>
+</body>`).window.document;
+  });
+  it("should add the email to the dom", () => {
+    // Make sure it's not there from the start
+    let isinDom = isEmailInDOM(mockDocument);
+    expect(isinDom).toBe(false);
+
+    // Now check after inserting into the dom
+    const mockEmailFromGitHub = "joe@gmail.com";
+    insertEmailIntoDOM(mockDocument, mockEmailFromGitHub);
+    isinDom = isEmailInDOM(mockDocument);
+    expect(isinDom).toBe(true);
   });
 });
