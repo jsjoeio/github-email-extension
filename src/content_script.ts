@@ -46,11 +46,25 @@ export function getEmailFromGitHubEventData(
 ) {
   let email: string | null = null;
   // Issue with types: https://github.com/octokit/rest.js/issues/128
+  const pushEvents = data.filter((eventData) => eventData.type === "PushEvent");
+
+  loopThroughPushEvents: for (let i = 0; i < pushEvents.length; i++) {
+    const event = pushEvents[i];
+    // @ts-expect-error
+    const commits = event.payload.commits;
+    loopThroughCommitsInPushEvent: for (let j = 0; j < commits.length; j++) {
+      const foundEmail = commits[i].author.email;
+      if (foundEmail) {
+        email = foundEmail;
+        break loopThroughPushEvents;
+      }
+    }
+  }
   data.map((eventData) => {
     if (eventData.type === "PushEvent") {
       // @ts-expect-error
       const commits: any[] = eventData.payload.commits;
-      commits.map((commit) => {
+      commits.forEach((commit) => {
         email = commit.author.email;
       });
     }
