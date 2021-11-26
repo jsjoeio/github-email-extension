@@ -1,19 +1,36 @@
 import { Octokit } from "@octokit/rest";
+const EMAIL_CLASS = ".u-email";
+const V_CARD_CLASS = ".vcard-details";
+
 /*
 NOTES
 
 Next steps:
-- test out
-- add Copy to clipboard into DOM
+- add copyToClipboard event listener to div containing clipboard SVG
+
+test with this
 
 */
+
+const clipboardHTML = `<div style="display: inline"><svg height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy" style="
+float: right;
+margin-right: 120px;
+">
+<path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+</svg></div>`;
+
+function copyToClipboard(_window: Window) {
+  const email = document.querySelector(EMAIL_CLASS);
+  if (email) {
+    _window?.getSelection()?.selectAllChildren(email);
+  }
+}
 
 /**
  * Checks for the email in the DOM using querySelector.
  * @returns {boolean} true if in DOM, false if not.
  */
 export function isEmailInDOM(_document: Document) {
-  const EMAIL_CLASS = ".u-email";
   const emailElement = _document.querySelector(EMAIL_CLASS);
   return emailElement !== null;
 }
@@ -68,14 +85,24 @@ export function getEmailFromGitHubEventData(
  * Adds Node to DOM with email
  */
 export function insertEmailIntoDOM(_document: Document, email: string) {
-  // implement
-  const V_CARD_CLASS = ".vcard-details";
   const vCardElement = _document.querySelector(V_CARD_CLASS);
 
   const emailElement = buildEmailElement(email);
 
   vCardElement?.insertAdjacentHTML("beforeend", emailElement);
 }
+
+/**
+ * Adds clipboard SVG HTML to DOM after email
+ */
+export function insertClipboardSVGIntoDOM(_document: Document) {
+  const emailListeElement = _document.querySelector('[itemprop="email"]');
+  if (emailListeElement) {
+    emailListeElement.insertAdjacentHTML("beforeend", clipboardHTML);
+    console.log("[GitHub Email Extension]: added clipboardHTML to DOM");
+  }
+}
+
 export const buildEmailElement = (
   email: string
 ) => `<li itemprop="email" aria-label="Email: ${email}" class="vcard-detail pt-1 css-truncate css-truncate-target "><svg class="octicon octicon-mail" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.75 2A1.75 1.75 0 000 3.75v.736a.75.75 0 000 .027v7.737C0 13.216.784 14 1.75 14h12.5A1.75 1.75 0 0016 12.25v-8.5A1.75 1.75 0 0014.25 2H1.75zM14.5 4.07v-.32a.25.25 0 00-.25-.25H1.75a.25.25 0 00-.25.25v.32L8 7.88l6.5-3.81zm-13 1.74v6.441c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25V5.809L8.38 9.397a.75.75 0 01-.76 0L1.5 5.809z"></path></svg>
@@ -95,12 +122,16 @@ export async function init() {
     const email = getEmailFromGitHubEventData(userEventData);
     if (email) {
       insertEmailIntoDOM(document, email);
+      insertClipboardSVGIntoDOM(document);
     } else {
       console.warn(
         "[GitHub Email Extension]: Could not find email in user's latest public event data."
       );
+      return;
     }
   }
+
+  insertClipboardSVGIntoDOM(document);
 }
 
 (async function () {
