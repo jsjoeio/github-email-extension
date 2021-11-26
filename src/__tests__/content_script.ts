@@ -1,5 +1,9 @@
 import jsdom from "jsdom";
-import { isEmailInDOM, getGitHubUsernameFromURL } from "../content_script";
+import {
+  isEmailInDOM,
+  getGitHubUsernameFromURL,
+  fetchGitHubUserEventData,
+} from "../content_script";
 
 const { JSDOM } = jsdom;
 
@@ -37,14 +41,24 @@ describe("getGitHubUsernameFromURL", () => {
   beforeEach(() => {
     // initialize DOM with empty body
     mockLocation = new JSDOM(
-      `<!DOCTYPE html><a class="u-email Link--primary " href="mailto:joe@gmail.com">joe@gmail.com</a>`
-    , {
-      url: "https://github.com/jsjoeio"
-    }).window.location;
+      `<!DOCTYPE html><a class="u-email Link--primary " href="mailto:joe@gmail.com">joe@gmail.com</a>`,
+      {
+        url: "https://github.com/jsjoeio",
+      }
+    ).window.location;
   });
   it("should parse the GitHub username and return it", () => {
     const username = getGitHubUsernameFromURL(mockLocation);
     const expected = "jsjoeio";
     expect(username).toBe(expected);
+  });
+});
+
+describe("fetchGitHubUserEventData", () => {
+  it("should return data", async () => {
+    // implement
+    const username = "jsjoeio";
+    const data = await fetchGitHubUserEventData(username);
+    expect(data).not.toBeNull();
   });
 });

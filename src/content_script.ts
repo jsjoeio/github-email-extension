@@ -1,8 +1,9 @@
+import { Octokit } from "@octokit/rest";
 /*
 NOTES
 
 Next steps:
-- getGitHubUsernameFromURL
+- fetchGitHubUserData
 
 */
 
@@ -21,6 +22,19 @@ export function isEmailInDOM(_document: Document) {
  */
 export function getGitHubUsernameFromURL(_location: Location) {
   return _location.href.split("/")[3];
+}
+
+/**
+ * Returns GitHub user event data using a username
+ */
+export async function fetchGitHubUserEventData(username: string) {
+  const octokit = new Octokit();
+  const data = await octokit.rest.activity.listPublicEventsForUser({
+    username,
+    per_page: 10,
+  });
+
+  return data;
 }
 
 export function init() {
