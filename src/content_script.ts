@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 NOTES
 
 Next steps:
-- fetchGitHubUserData
+- getEmailFromGitHubEventData
 
 */
 
@@ -29,12 +29,33 @@ export function getGitHubUsernameFromURL(_location: Location) {
  */
 export async function fetchGitHubUserEventData(username: string) {
   const octokit = new Octokit();
-  const data = await octokit.rest.activity.listPublicEventsForUser({
+  const { data } = await octokit.rest.activity.listPublicEventsForUser({
     username,
     per_page: 10,
   });
 
   return data;
+}
+
+/**
+ * Returns the email after parsing the GitHubUserEventData
+ */
+export function getEmailFromGitHubEventData(
+  data: Awaited<ReturnType<typeof fetchGitHubUserEventData>>
+) {
+  let email: string | null = null;
+  // Issue with types: https://github.com/octokit/rest.js/issues/128
+  data.map((eventData) => {
+    if (eventData.type === "PushEvent") {
+      // @ts-expect-error
+      const commits: any[] = eventData.payload.commits;
+      commits.map((commit) => {
+        email = commit.author.email;
+      });
+    }
+  });
+
+  return email;
 }
 
 export function init() {
