@@ -2,6 +2,7 @@
 NOTES
 
 Next steps:
+- getGitHubUsernameFromURL
 
 */
 
@@ -13,6 +14,13 @@ export function isEmailInDOM(_document: Document) {
   const EMAIL_CLASS = ".u-email";
   const emailElement = _document.querySelector(EMAIL_CLASS);
   return emailElement !== null;
+}
+
+/**
+ * Returns the GitHub username from the URL
+ */
+export function getGitHubUsernameFromURL(_location: Location) {
+  return _location.href.split("/")[3];
 }
 
 export function init() {
