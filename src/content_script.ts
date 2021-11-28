@@ -8,11 +8,8 @@ NOTES
 
 Next steps:
   
-Add a micro animation where user clicks copy then:
-- replace SVG with "Copied [checkmark svg]"
-- set timeout for 200ms or something
-- add back the SVG
-
+- fix match contents URL glob
+- clean up name and icon
 
 */
 
