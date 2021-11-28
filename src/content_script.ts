@@ -1,29 +1,77 @@
 import { Octokit } from "@octokit/rest";
 const EMAIL_CLASS = ".u-email";
 const V_CARD_CLASS = ".vcard-details";
+const CLIPBOARD_CONTAINER_DIV_ID = "github-email-extension_copy-clipboard-svg";
 
 /*
 NOTES
 
 Next steps:
-- add copyToClipboard event listener to div containing clipboard SVG
+  
+Add a micro animation where user clicks copy then:
+- replace SVG with "Copied [checkmark svg]"
+- set timeout for 200ms or something
+- add back the SVG
 
-test with this
 
 */
 
-const clipboardHTML = `<div style="display: inline"><svg height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy" style="
-float: right;
-margin-right: 120px;
+const copiedCheckMarkHTML = `<div id="github-email-extension_copy-clipboard-svg" style="display: inline-block;cursor: copy;float: right;">
+<div style="
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 94px;
+    height: 20px;
+    align-items: flex-start;
 ">
+<span style="
+    display: block;
+">Copied</span>
+<svg aria-label="1 / 1 checks OK" role="img" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check" style="
+    display: block;
+    fill: rgb(38, 205, 77);
+">
+    <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
+</svg></div></div>`;
+
+const clipboardHTML = `<div id="github-email-extension_copy-clipboard-svg" style="display: inline-flex;flex-direction: row;justify-content: right;align-items: center;cursor: copy;width: 94px; height:20px;"><svg height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy" style="/* float: right; *//* margin-right: 120px; */">
 <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
 </svg></div>`;
 
-function copyToClipboard(_window: Window) {
-  const email = document.querySelector(EMAIL_CLASS);
+async function copyToClipboard(
+  _window: Window,
+  _document: Document,
+  _navigator: Navigator
+) {
+  const email = _document.querySelector(EMAIL_CLASS);
   if (email) {
-    _window?.getSelection()?.selectAllChildren(email);
+    const selection = _window?.getSelection()?.selectAllChildren(email);
+
+    await _navigator.clipboard.writeText(email.textContent || "");
+    // Unselect text
+    _window.getSelection()?.removeAllRanges();
+
+    const divContainer = _document.querySelector(
+      `#${CLIPBOARD_CONTAINER_DIV_ID}`
+    );
+
+    if (divContainer) {
+      // Replace element with our other one
+      divContainer.outerHTML = copiedCheckMarkHTML;
+    }
   }
+}
+
+function registerCopyToClipboardEventListener(
+  _window: Window,
+  _document: Document,
+  _navigator: Navigator,
+  divElement: HTMLDivElement
+) {
+  divElement.addEventListener("click", () => {
+    copyToClipboard(_window, _document, _navigator);
+  });
 }
 
 /**
@@ -99,7 +147,6 @@ export function insertClipboardSVGIntoDOM(_document: Document) {
   const emailListeElement = _document.querySelector('[itemprop="email"]');
   if (emailListeElement) {
     emailListeElement.insertAdjacentHTML("beforeend", clipboardHTML);
-    console.log("[GitHub Email Extension]: added clipboardHTML to DOM");
   }
 }
 
@@ -110,7 +157,6 @@ export const buildEmailElement = (
 </li>`;
 
 export async function init() {
-  console.log("initializing chrome extension...");
   // Check for email
   const hasEmailInProfile = isEmailInDOM(document);
 
@@ -123,6 +169,19 @@ export async function init() {
     if (email) {
       insertEmailIntoDOM(document, email);
       insertClipboardSVGIntoDOM(document);
+
+      const divElement: HTMLDivElement | null = document.querySelector(
+        "#github-email-extension_copy-clipboard-svg"
+      );
+
+      if (divElement) {
+        registerCopyToClipboardEventListener(
+          window,
+          document,
+          navigator,
+          divElement
+        );
+      }
     } else {
       console.warn(
         "[GitHub Email Extension]: Could not find email in user's latest public event data."
@@ -132,6 +191,19 @@ export async function init() {
   }
 
   insertClipboardSVGIntoDOM(document);
+
+  const divElement: HTMLDivElement | null = document.querySelector(
+    "#github-email-extension_copy-clipboard-svg"
+  );
+
+  if (divElement) {
+    registerCopyToClipboardEventListener(
+      window,
+      document,
+      navigator,
+      divElement
+    );
+  }
 }
 
 (async function () {
