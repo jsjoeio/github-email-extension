@@ -8,7 +8,6 @@ NOTES
 
 Next steps:
   
-- fix match contents URL glob
 - clean up name and icon
 
 */
