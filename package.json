@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-typescript-starter",
+  "name": "github-email-extension",
   "version": "1.0.0",
-  "description": "chrome-extension-typescript-starter",
+  "description": "A browser extension which shows a developer's email on their profile page (if not there already) by searching their commits.",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
+    "url": "https://github.com/jsjoeio/github-email-extension.git"
   },
   "devDependencies": {
     "@types/chrome": "0.0.158",
