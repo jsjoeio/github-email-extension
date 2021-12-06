@@ -3,15 +3,6 @@ const EMAIL_CLASS = ".u-email";
 const V_CARD_CLASS = ".vcard-details";
 const CLIPBOARD_CONTAINER_DIV_ID = "github-email-extension_copy-clipboard-svg";
 
-/*
-NOTES
-
-Next steps:
-  
-- clean up name and icon
-
-*/
-
 const copiedCheckMarkHTML = `<div id="github-email-extension_copy-clipboard-svg" style="display: inline-block;cursor: copy;float: right;">
 <div style="
     display: flex;
