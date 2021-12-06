@@ -165,20 +165,6 @@ export async function init() {
     const email = getEmailFromGitHubEventData(userEventData);
     if (email) {
       insertEmailIntoDOM(document, email);
-      insertClipboardSVGIntoDOM(document);
-
-      const divElement: HTMLDivElement | null = document.querySelector(
-        "#github-email-extension_copy-clipboard-svg"
-      );
-
-      if (divElement) {
-        registerCopyToClipboardEventListener(
-          window,
-          document,
-          navigator,
-          divElement
-        );
-      }
     } else {
       console.warn(
         "[GitHub Email Extension]: Could not find email in user's latest public event data."
